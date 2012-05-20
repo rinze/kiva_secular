@@ -79,7 +79,7 @@ def main():
 		"Atheists, Agnostics, Skeptics, Freethinkers, Secular Humanists and the Non-Religious"</a></p>
 		
 		<p>You can find the code for the script used to generate this web page 
-		<a href="https://github.com/rinze/kiva_secular/">in this Github</a>.</p>
+		<a href="https://github.com/rinze/kiva_secular/">in Github</a>.</p>
 
 		<p>This page is updated every 5 hours. Enjoy.</p>
 		
