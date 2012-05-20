@@ -81,47 +81,36 @@ def main():
 		"Atheists, Agnostics, Skeptics, Freethinkers, Secular Humanists and the Non-Religious"</a></p>
 		
 		<p>You can find the code for the script used to generate this web page 
-		<a href="http://code.google.com/p/kivasecular">in this Google Code Project</a>.</p>
+		<a href="https://github.com/rinze/kiva_secular/">in this Github</a>.</p>
 
 		<p>This page is updated every 5 hours. Enjoy.</p>
 		
 		<div id="loanlist">
 	"""
-	for id in approved_projects:
-		if id not in parsed_projects:
-			parsed_projects.append(id)
-			html_data += '<SCRIPT type="text/javascript" src="http://www.kiva.org/banners/bannerBlock.php?busId='
-			html_data += id+'" language="javascript"></SCRIPT>\n'
+	for p in approved_projects:
+		if p not in parsed_projects:
+			parsed_projects.append(p)
+			#html_data += '<SCRIPT type="text/javascript" src="http://www.kiva.org/banners/bannerBlock.php?busId='
+			#html_data += id+'" language="javascript"></SCRIPT>\n'
+			html_data += generateBlock(p)
+
 
 
 
 	now = datetime.utcnow()
 	now = now.strftime("%A, %d. %B %Y %I:%M%p")
 
-	html_data += '\n<p>Last updated: ' + now + '</p>\n\n</div>\n\n</body>\n</html>'
+	html_data += '</div>\n<p>Last updated: '
+	html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
 
 	print html_data	
 
-def generateBlock(project_id, handler):
+def generateBlock(project_id):
+
+	res = '<a href="http://www.kiva.org/lend/'+project_id+'">'
+	res += 'Loan ' + project_id + '</a> '
+	return res
 	
-	block_text = """
-	<div style="border: 1px solid gray;width: 260px;height: 170px;margin: 0;padding: 0;background-color: #fff;">
-	<table height="170" width="260"  style="margin:0px; padding: 0; background-color:#fff;"><tr>
-	<td style="text-align: center;" width="130" height="105">
-	<a  href="http://www.kiva.org/lend/PROJECTID?utm_source=viralbanner&amp;utm_medium=viral&amp;utm_content=block260x170&amp;utm_campaign=banner" target="_blank" >
-	<img  border="0" src="http://s3-1.kiva.org/img/w125h100/PROJECTIMAGE.jpg" style="margin: 0px; border:1px solid gray; text-align:center;" /></a>
-	</td><td valign="top" style="font-size:16px;font-family:  Helvetica,Arial,sans-serif;color:#060;font-weight:bold;line-height:1.4;text-align: center;" >
-	Make&nbsp;a&nbsp;loan<br/>Change&nbsp;a&nbsp;life<br/>
-	<a href="http://www.kiva.org/lend/PROJECTID?utm_source=viralbanner&utm_medium=viral&utm_content=block260x170&utm_campaign=banner" target="_blank">
-	<img src="http://l3-1.kiva.org/r22581/images/bannersmall.png"width="95" height="45" alt="Kiva logo"
-	title="Kiva - loans that change lives" border="0" align="bottom" style="margin: 0px;" />
-	</a></td></tr><tr><td style="text-align:left;padding-left:5px;padding-bottom:5px;font-size:12px;font-family: Helvetica,Arial,sans-serif;color:#060;font-weight:normal;line-height:1.4;">Name:     <a style="color:#00c;" href="http://www.kiva.org/lend/PROJECTID?utm_source=viralbanner&utm_medium=viral&utm_content=block260x170&utm_campaign=banner" target="_blank">Mom Chea</a> <br/>Location: <a style="color:#00c;" href="http://www.kiva.org/lend/PROJECTID?utm_source=viralbanner&utm_medium=viral&utm_content=block260x170&utm_campaign=banner" target="_blank">Cambodia</a></td><td style="text-align: center;margin-bottom:5px;font-size:10px;font-family:  Helvetica,Arial,sans-serif;color:#006600;font-weight:normal;line-height:1.4;">Loan&nbsp;Needed:&nbsp;$1,200<table height="15" style="border:1px solid black;"><tr><td width="96" style="background-color:#f00;"></td><td width="4" style="background-color:#eee"></td></tr></table>96 % funded</td></tr></table></div>
-	"""
-
-	block_text = block_text.replace('PROJECTID', project_id)
-	block_text = block_text.replace('PROJECTIMAGE', handler.getProjectImage(id))
-
-	return(block_text)
 
 def buildPartnerURL(partner_id, page):
 	#global app_id
