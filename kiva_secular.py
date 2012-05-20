@@ -23,14 +23,11 @@ from ParseKivaProjects import ParseKivaProjects
 from datetime import datetime
 
 __author__ = 'José María Mateos - chema@rinzewind.org'
-app_id = 'org.rinzewind.kiva_secular'
 
 def main():
 	forbidden_mfi_list = []
 	approved_projects = []
 	parsed_projects = []
-
-	global app_id
 
 	religious_mfi_doc_url = 'http://spreadsheets.google.com/pub?key=ty2bXC4IvFg1ozCoPmsflUQ&single=true&gid=0&output=csv'
 	kiva_partners_url = 'http://api.kivaws.org/v1/partners.xml'
@@ -114,13 +111,11 @@ def generateBlock(project_id):
 	
 
 def buildPartnerURL(partner_id, page):
-	#global app_id
 	base_string = 'http://api.kivaws.org/v1/loans/search.xml?'
 	base_string += 'status=fundraising'
 	base_string += '&partner='+partner_id
 	base_string += '&page='+str(page)
 	base_string += '&sort_by=popularity'
-	#base_string += '&app_id='+str(app_id)
 	return base_string
 
 
