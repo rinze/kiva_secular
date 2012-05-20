@@ -20,7 +20,7 @@ __author__ = 'José María Mateos - chema@rinzewind.org'
 
 class ParseKivaProjects(xml.sax.handler.ContentHandler):
 
-        def __init__(self):
+	def __init__(self):
 		self.pick_id = 0
 		self.in_image = 0
 		self.in_country = 0
@@ -33,8 +33,8 @@ class ParseKivaProjects(xml.sax.handler.ContentHandler):
 		self.temp_country = ''
 		self.temp_name = ''
 
-        def startElement(self, name, attributes):
-                if name == 'id':
+	def startElement(self, name, attributes):
+		if name == 'id':
 			self.pick_id = 1
 		elif name == 'image':
 			self.in_image = 1

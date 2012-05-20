@@ -22,7 +22,7 @@ from ParseKivaProjects import ParseKivaProjects
 from datetime import datetime
 
 __author__ = 'José María Mateos - chema@rinzewind.org'
-app_id = 'org.rinzewind.kiva_secular.testing'
+app_id = 'org.rinzewind.kiva_secular'
 
 def main():
 	forbidden_mfi_list = []
@@ -59,10 +59,10 @@ def main():
 	parser.setContentHandler(handler)
 
 	for page in range(1, 6):
-		query_projects_str = buildPartnerURL(str_approved_list, page)
-		temp_sock = urllib.urlopen(query_projects_str)
-		parser.parse(temp_sock)
-		temp_sock.close()
+	    query_projects_str = buildPartnerURL(str_approved_list, page)
+	    temp_sock = urllib.urlopen(query_projects_str)
+	    parser.parse(temp_sock)
+	    temp_sock.close()
 
 	approved_projects = handler.getApprovedList()
 
@@ -90,11 +90,9 @@ def main():
 	for id in approved_projects:
 		if id not in parsed_projects:
 			parsed_projects.append(id)
-			#debug_string = "Processed project: " + id
-			#print debug_string
 			html_data += '<SCRIPT type="text/javascript" src="http://www.kiva.org/banners/bannerBlock.php?busId='
 			html_data += id+'" language="javascript"></SCRIPT>\n'
-			#html_data += generateBlock(id, handler)
+
 
 
 	now = datetime.utcnow()
@@ -126,13 +124,13 @@ def generateBlock(project_id, handler):
 	return(block_text)
 
 def buildPartnerURL(partner_id, page):
-	global app_id
+	#global app_id
 	base_string = 'http://api.kivaws.org/v1/loans/search.xml?'
 	base_string += 'status=fundraising'
 	base_string += '&partner='+partner_id
 	base_string += '&page='+str(page)
 	base_string += '&sort_by=popularity'
-	base_string += '&app_id='+str(app_id)
+	#base_string += '&app_id='+str(app_id)
 	return base_string
 
 

@@ -20,14 +20,14 @@ __author__ = 'José María Mateos - chema@rinzewind.org'
 
 class ParseKivaPartners(xml.sax.handler.ContentHandler):
 
-        def __init__(self, forbidden_mfi_list):
-                self.forbidden_mfi_list = forbidden_mfi_list
+	def __init__(self, forbidden_mfi_list):
+		self.forbidden_mfi_list = forbidden_mfi_list
 		self.pick_id = 0
 		self.in_image = 0
 		self.approved_list = []
 
-        def startElement(self, name, attributes):
-                if name == 'id':
+	def startElement(self, name, attributes):
+		if name == 'id':
 			self.pick_id = 1
 		elif name == 'image':
 			self.in_image = 1
