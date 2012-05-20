@@ -18,7 +18,6 @@ import urllib
 import xml.sax.handler
 import json
 
-from ParseKivaPartners import ParseKivaPartners
 from ParseKivaProjects import ParseKivaProjects
 from datetime import datetime
 
@@ -29,21 +28,28 @@ def main():
 	approved_projects = []
 	parsed_projects = []
 	kiva_partners_url = 'http://api.kivaws.org/v1/partners.xml'
+	kiva_partners_url_json = 'http://api.kivaws.org/v1/partners.json'
 
 	# Get forbidden partners ids
 	forbidden_mfi_list = getForbiddenList()
 
-	parser = xml.sax.make_parser()
-	handler = ParseKivaPartners(forbidden_mfi_list)
-	parser.setContentHandler(handler)
-	temp_sock = urllib.urlopen(kiva_partners_url)
-	parser.parse(temp_sock)
+	# New method: JSON
+	temp_sock = urllib.urlopen(kiva_partners_url_json)
+	json_data = temp_sock.read()
 	temp_sock.close()
 
-	approved_list = handler.getApprovedList()
+	# Get JSON data as a dictionary
+	partners = json.JSONDecoder().decode(json_data)
+
+	# Remove religious organizations
+	allowed_partners = [partner for partner in partners['partners'] if partner['id'] not in forbidden_mfi_list]
+
+	approved_list = map(lambda x: str(x['id']), allowed_partners)	
+
 	str_approved_list = ','.join(approved_list)
 
 	# New handler for loop below
+	parser = xml.sax.make_parser()
 	handler = ParseKivaProjects()
 	parser.setContentHandler(handler)
 
