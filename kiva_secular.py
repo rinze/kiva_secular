@@ -25,22 +25,13 @@ from datetime import datetime
 __author__ = 'José María Mateos - chema@rinzewind.org'
 
 def main():
-	forbidden_mfi_list = []
+	# Define variables
 	approved_projects = []
 	parsed_projects = []
-
-	religious_mfi_doc_url = 'http://spreadsheets.google.com/pub?key=ty2bXC4IvFg1ozCoPmsflUQ&single=true&gid=0&output=csv'
 	kiva_partners_url = 'http://api.kivaws.org/v1/partners.xml'
 
-	temp_sock = urllib.urlopen(religious_mfi_doc_url)
-	data = temp_sock.readlines()
-	temp_sock.close()
-	for line in data:
-		mfi_code_list = line.split(',')
-		temp_length = len(mfi_code_list)
-		mfi_code = mfi_code_list[temp_length - 1].strip()
-		if mfi_code != 'MFI ID':
-			forbidden_mfi_list.append(mfi_code)
+	# Get forbidden partners ids
+	forbidden_mfi_list = getForbiddenList()
 
 	parser = xml.sax.make_parser()
 	handler = ParseKivaPartners(forbidden_mfi_list)
@@ -117,6 +108,25 @@ def buildPartnerURL(partner_id, page):
 	base_string += '&page='+str(page)
 	base_string += '&sort_by=popularity'
 	return base_string
+
+def getForbiddenList():
+
+	forbidden_mfi_list = []
+	# TODO: change to new list
+	religious_mfi_doc_url = 'http://spreadsheets.google.com/pub?key=ty2bXC4IvFg1ozCoPmsflUQ&single=true&gid=0&output=csv'
+
+	temp_sock = urllib.urlopen(religious_mfi_doc_url)
+	data = temp_sock.readlines()
+	temp_sock.close()
+	for line in data:
+		mfi_code_list = line.split(',')
+		temp_length = len(mfi_code_list)
+		mfi_code = mfi_code_list[temp_length - 1].strip()
+		if mfi_code != 'MFI ID':
+			forbidden_mfi_list.append(mfi_code)
+	
+	return forbidden_mfi_list
+
 
 
 if __name__ == '__main__':
