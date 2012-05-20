@@ -17,6 +17,7 @@
 import urllib
 import xml.sax.handler
 import json
+import random
 
 from ParseKivaProjects import ParseKivaProjects
 from datetime import datetime
@@ -43,11 +44,12 @@ def main():
 
 	# Remove religious organizations
 	allowed_partners = [partner for partner in partners['partners'] if int(partner['id']) not in forbidden_mfi_list]
-	print allowed_partners
-	print forbidden_mfi_list
 	approved_list = map(lambda x: str(x['id']), allowed_partners)	
 	str_approved_list = ','.join(approved_list)
-	print len(approved_list)
+
+	# The output will change every N minutes (depending on the cron settings). 
+	# Let's choose 10 partners and use them to search for loans
+	chosen_partners = random.sample(approved_list, 10)
 
 	# New handler for loop below
 	parser = xml.sax.make_parser()
@@ -90,9 +92,6 @@ def main():
 			#html_data += id+'" language="javascript"></SCRIPT>\n'
 			html_data += generateBlock(p)
 
-
-
-
 	now = datetime.utcnow()
 	now = now.strftime("%A, %d. %B %Y %I:%M%p")
 
@@ -121,7 +120,6 @@ def getForbiddenList():
 	forbidden_mfi_list = []
 	# TODO: change to new list
 	religious_mfi_doc_url = 'http://spreadsheets.google.com/pub?key=ty2bXC4IvFg1ozCoPmsflUQ&single=true&gid=0&output=csv'
-
 	temp_sock = urllib.urlopen(religious_mfi_doc_url)
 	data = temp_sock.readlines()
 	temp_sock.close()
