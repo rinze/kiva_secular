@@ -16,6 +16,7 @@
 
 import urllib
 import xml.sax.handler
+import json
 
 from ParseKivaPartners import ParseKivaPartners
 from ParseKivaProjects import ParseKivaProjects
@@ -32,7 +33,7 @@ def main():
 	global app_id
 
 	religious_mfi_doc_url = 'http://spreadsheets.google.com/pub?key=ty2bXC4IvFg1ozCoPmsflUQ&single=true&gid=0&output=csv'
-	kiva_partners_url = 'http://api.kivaws.org/v1/partners.xml?app_id='+app_id
+	kiva_partners_url = 'http://api.kivaws.org/v1/partners.xml'
 
 	temp_sock = urllib.urlopen(religious_mfi_doc_url)
 	data = temp_sock.readlines()
