@@ -42,11 +42,12 @@ def main():
 	partners = json.JSONDecoder().decode(json_data)
 
 	# Remove religious organizations
-	allowed_partners = [partner for partner in partners['partners'] if partner['id'] not in forbidden_mfi_list]
-
+	allowed_partners = [partner for partner in partners['partners'] if int(partner['id']) not in forbidden_mfi_list]
+	print allowed_partners
+	print forbidden_mfi_list
 	approved_list = map(lambda x: str(x['id']), allowed_partners)	
-
 	str_approved_list = ','.join(approved_list)
+	print len(approved_list)
 
 	# New handler for loop below
 	parser = xml.sax.make_parser()
@@ -129,7 +130,7 @@ def getForbiddenList():
 		temp_length = len(mfi_code_list)
 		mfi_code = mfi_code_list[temp_length - 1].strip()
 		if mfi_code != 'MFI ID':
-			forbidden_mfi_list.append(mfi_code)
+			forbidden_mfi_list.append(int(mfi_code))
 	
 	return forbidden_mfi_list
 
