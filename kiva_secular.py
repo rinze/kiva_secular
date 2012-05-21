@@ -47,7 +47,7 @@ def main():
 	approved_list = map(lambda x: str(x['id']), allowed_partners)	
 	str_approved_list = ','.join(approved_list)
 
-	# The output will change every N minutes (depending on the cron settings). 
+	# The output will change every N hours (depending on the cron settings). 
 	# Let's choose 10 partners and use them to search for loans
 	chosen_partners = random.sample(approved_list, 10)
 
