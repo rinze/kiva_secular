@@ -25,115 +25,115 @@ from datetime import datetime
 __author__ = 'José María Mateos - chema@rinzewind.org'
 
 def main():
-	# Define variables
-	approved_projects = []
-	parsed_projects = []
-	kiva_partners_url = 'http://api.kivaws.org/v1/partners.xml'
-	kiva_partners_url_json = 'http://api.kivaws.org/v1/partners.json'
+    # Define variables
+    approved_projects = []
+    parsed_projects = []
+    kiva_partners_url = 'http://api.kivaws.org/v1/partners.xml'
+    kiva_partners_url_json = 'http://api.kivaws.org/v1/partners.json'
 
-	# Get forbidden partners ids
-	forbidden_mfi_list = getForbiddenList()
+    # Get forbidden partners ids
+    forbidden_mfi_list = getForbiddenList()
 
-	# New method: JSON
-	temp_sock = urllib.urlopen(kiva_partners_url_json)
-	json_data = temp_sock.read()
-	temp_sock.close()
+    # New method: JSON
+    temp_sock = urllib.urlopen(kiva_partners_url_json)
+    json_data = temp_sock.read()
+    temp_sock.close()
 
-	# Get JSON data as a dictionary
-	partners = json.JSONDecoder().decode(json_data)
+    # Get JSON data as a dictionary
+    partners = json.JSONDecoder().decode(json_data)
 
-	# Remove religious organizations
-	allowed_partners = [partner for partner in partners['partners'] if int(partner['id']) not in forbidden_mfi_list]
-	approved_list = map(lambda x: str(x['id']), allowed_partners)	
-	str_approved_list = ','.join(approved_list)
+    # Remove religious organizations
+    allowed_partners = [partner for partner in partners['partners'] if int(partner['id']) not in forbidden_mfi_list]
+    approved_list = map(lambda x: str(x['id']), allowed_partners)   
+    str_approved_list = ','.join(approved_list)
 
-	# The output will change every N hours (depending on the cron settings). 
-	# Let's choose 10 partners and use them to search for loans
-	chosen_partners = random.sample(approved_list, 10)
+    # The output will change every N hours (depending on the cron settings). 
+    # Let's choose 10 partners and use them to search for loans
+    chosen_partners = random.sample(approved_list, 10)
 
-	# New handler for loop below
-	parser = xml.sax.make_parser()
-	handler = ParseKivaProjects()
-	parser.setContentHandler(handler)
+    # New handler for loop below
+    parser = xml.sax.make_parser()
+    handler = ParseKivaProjects()
+    parser.setContentHandler(handler)
 
-	for page in range(1, 6):
-	    query_projects_str = buildPartnerURL(str_approved_list, page)
-	    temp_sock = urllib.urlopen(query_projects_str)
-	    parser.parse(temp_sock)
-	    temp_sock.close()
+    for page in range(1, 6):
+        query_projects_str = buildPartnerURL(str_approved_list, page)
+        temp_sock = urllib.urlopen(query_projects_str)
+        parser.parse(temp_sock)
+        temp_sock.close()
 
-	approved_projects = handler.getApprovedList()
+    approved_projects = handler.getApprovedList()
 
-	html_data = """
-	<html>
-		<head>
-			<title>Kiva Secular Loans</title>
-			<link rel="stylesheet" rev="stylesheet" href="styles.css" type="text/css" media="all">
-		</head>
-		<body>
-		<h1>Kiva Secular</h1>
-		<p>Listed below you will find projects being funded by non-religious Kiva field 
-		partners. This list has been generated using the information contained on the 
-		<a href="http://atheist-monkey.blogspot.com/2009/08/kiva-mfi-checker.html#list">list compiled</a>
-		by the <a href="http://www.kiva.org/community/teams/view?team_id=94">Kiva Lending Team 
-		"Atheists, Agnostics, Skeptics, Freethinkers, Secular Humanists and the Non-Religious"</a></p>
-		
-		<p>You can find the code for the script used to generate this web page 
-		<a href="https://github.com/rinze/kiva_secular/">in Github</a>.</p>
+    html_data = """
+    <html>
+        <head>
+            <title>Kiva Secular Loans</title>
+            <link rel="stylesheet" rev="stylesheet" href="styles.css" type="text/css" media="all">
+        </head>
+        <body>
+        <h1>Kiva Secular</h1>
+        <p>Listed below you will find projects being funded by non-religious Kiva field 
+        partners. This list has been generated using the information contained on the 
+        <a href="http://atheist-monkey.blogspot.com/2009/08/kiva-mfi-checker.html#list">list compiled</a>
+        by the <a href="http://www.kiva.org/community/teams/view?team_id=94">Kiva Lending Team 
+        "Atheists, Agnostics, Skeptics, Freethinkers, Secular Humanists and the Non-Religious"</a></p>
+        
+        <p>You can find the code for the script used to generate this web page 
+        <a href="https://github.com/rinze/kiva_secular/">in Github</a>.</p>
 
-		<p>This page is updated every 5 hours. Enjoy.</p>
-		
-		<div id="loanlist">
-	"""
-	for p in approved_projects:
-		if p not in parsed_projects:
-			parsed_projects.append(p)
-			#html_data += '<SCRIPT type="text/javascript" src="http://www.kiva.org/banners/bannerBlock.php?busId='
-			#html_data += id+'" language="javascript"></SCRIPT>\n'
-			html_data += generateBlock(p)
+        <p>This page is updated every 5 hours. Enjoy.</p>
+        
+        <div id="loanlist">
+    """
+    for p in approved_projects:
+        if p not in parsed_projects:
+            parsed_projects.append(p)
+            #html_data += '<SCRIPT type="text/javascript" src="http://www.kiva.org/banners/bannerBlock.php?busId='
+            #html_data += id+'" language="javascript"></SCRIPT>\n'
+            html_data += generateBlock(p)
 
-	now = datetime.utcnow()
-	now = now.strftime("%A, %d. %B %Y %I:%M%p")
+    now = datetime.utcnow()
+    now = now.strftime("%A, %d. %B %Y %I:%M%p")
 
-	html_data += '</div>\n<p>Last updated: '
-	html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
+    html_data += '</div>\n<p>Last updated: '
+    html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
 
-	print html_data	
+    print html_data 
 
 def generateBlock(project_id):
 
-	res = '<a href="http://www.kiva.org/lend/'+project_id+'">'
-	res += 'Loan ' + project_id + '</a> '
-	return res
-	
+    res = '<a href="http://www.kiva.org/lend/'+project_id+'">'
+    res += 'Loan ' + project_id + '</a> '
+    return res
+    
 
 def buildPartnerURL(partner_id, page):
-	base_string = 'http://api.kivaws.org/v1/loans/search.xml?'
-	base_string += 'status=fundraising'
-	base_string += '&partner='+partner_id
-	base_string += '&page='+str(page)
-	base_string += '&sort_by=popularity'
-	return base_string
+    base_string = 'http://api.kivaws.org/v1/loans/search.xml?'
+    base_string += 'status=fundraising'
+    base_string += '&partner='+partner_id
+    base_string += '&page='+str(page)
+    base_string += '&sort_by=popularity'
+    return base_string
 
 def getForbiddenList():
 
-	forbidden_mfi_list = []
-	# TODO: change to new list
-	religious_mfi_doc_url = 'http://spreadsheets.google.com/pub?key=ty2bXC4IvFg1ozCoPmsflUQ&single=true&gid=0&output=csv'
-	temp_sock = urllib.urlopen(religious_mfi_doc_url)
-	data = temp_sock.readlines()
-	temp_sock.close()
-	for line in data:
-		mfi_code_list = line.split(',')
-		temp_length = len(mfi_code_list)
-		mfi_code = mfi_code_list[temp_length - 1].strip()
-		if mfi_code != 'MFI ID':
-			forbidden_mfi_list.append(int(mfi_code))
-	
-	return forbidden_mfi_list
+    forbidden_mfi_list = []
+    # TODO: change to new list
+    religious_mfi_doc_url = 'http://spreadsheets.google.com/pub?key=ty2bXC4IvFg1ozCoPmsflUQ&single=true&gid=0&output=csv'
+    temp_sock = urllib.urlopen(religious_mfi_doc_url)
+    data = temp_sock.readlines()
+    temp_sock.close()
+    for line in data:
+        mfi_code_list = line.split(',')
+        temp_length = len(mfi_code_list)
+        mfi_code = mfi_code_list[temp_length - 1].strip()
+        if mfi_code != 'MFI ID':
+            forbidden_mfi_list.append(int(mfi_code))
+    
+    return forbidden_mfi_list
 
 
 
 if __name__ == '__main__':
-	main()
+    main()
 
