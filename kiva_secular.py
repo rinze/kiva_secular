@@ -18,6 +18,9 @@ import urllib
 import xml.sax.handler
 import json
 import random
+import csv
+import urllib2
+from cookielib import CookieJar
 
 from ParseKivaProjects import ParseKivaProjects
 from datetime import datetime
@@ -41,6 +44,16 @@ def main():
 
     # Get JSON data as a dictionary
     partners = json.JSONDecoder().decode(json_data)
+
+    # New list and new method for reading
+    url = 'https://docs.google.com/spreadsheet/ccc?key=0AhfuHQgSfgERdDhUOW9jajFUSWFiang0eXVlSGI3YVE&authkey=CK36kZMN&hl=en&output=csv#gid=1'
+    # Cookie management
+    cj = CookieJar()
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    csv_data = csv.reader(opener.open(url))
+    fields = (0, 6) # id, score
+    # TODO: allowed_partners should come out of this, not by filtering with the previous list.
+
 
     # Remove religious organizations
     allowed_partners = [partner for partner in partners['partners'] if int(partner['id']) not in forbidden_mfi_list]
