@@ -31,7 +31,6 @@ def main():
     # Define variables
     approved_projects = []
     parsed_projects = []
-    kiva_partners_url = 'http://api.kivaws.org/v1/partners.xml'
     kiva_partners_url_json = 'http://api.kivaws.org/v1/partners.json'
 
     # Get forbidden partners ids
@@ -48,21 +47,38 @@ def main():
     # New list and new method for reading
     url = 'https://docs.google.com/spreadsheet/ccc?key=0AhfuHQgSfgERdDhUOW9jajFUSWFiang0eXVlSGI3YVE&authkey=CK36kZMN&hl=en&output=csv#gid=1'
     # Cookie management
-    cj = CookieJar()
-    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
+    opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(CookieJar()))
     csv_data = csv.reader(opener.open(url))
-    fields = (0, 6) # id, score
-    # TODO: allowed_partners should come out of this, not by filtering with the previous list.
+    # Get rid of header
+    csv_data.next()
 
+    # Fields of interest:
+    # 0 - ID
+    # 6 - Secular Rating
+    # 9 - Social Rating
+    partners = [(p[0], partner_score(p[6], p[9])) for p in csv_data]
+
+    # Get maximum possible score
+    max_score = max([p[1] for p in partners])
+
+    # TODO: Might need to rethink the whole score thing
+    # Beware that partners is a variable previously used. 
+    # Won't be necessary when this is complete, though.
+    partners.sort(reverse=True, key=lambda x: x[1])
+
+    # Let's take the partners in the top 90% percentile
+    approved_list = [x[0] for x in partners if x[1] >= int(max_score*0.9)]
 
     # Remove religious organizations
-    allowed_partners = [partner for partner in partners['partners'] if int(partner['id']) not in forbidden_mfi_list]
-    approved_list = map(lambda x: str(x['id']), allowed_partners)   
+    # allowed_partners = [partner for partner in partners['partners'] if int(partner['id']) not in forbidden_mfi_list]
+    # approved_list = map(lambda x: str(x['id']), allowed_partners)   
     str_approved_list = ','.join(approved_list)
 
     # The output will change every N hours (depending on the cron settings). 
     # Let's choose 10 partners and use them to search for loans
     chosen_partners = random.sample(approved_list, 10)
+
+    # TODO: use the chosen_partners variable to get new projects
 
     # New handler for loop below
     parser = xml.sax.make_parser()
@@ -113,12 +129,21 @@ def main():
 
     print html_data 
 
+def partner_score(secular, social):
+    """ Computes partner score. There are lots of Kiva partners with a high
+    secular rating, so let's use the social rating as well in a weighted
+    way."""
+    secular = int(secular) if secular != '' else 0
+    social = int(social) if social != '' else 0
+    # No crappy partners
+    if secular == 0 or social == 0: return 0
+    else: return 2*secular + social
+
 def generateBlock(project_id):
 
     res = '<a href="http://www.kiva.org/lend/'+project_id+'">'
     res += 'Loan ' + project_id + '</a> '
     return res
-    
 
 def buildPartnerURL(partner_id, page):
     base_string = 'http://api.kivaws.org/v1/loans/search.xml?'
