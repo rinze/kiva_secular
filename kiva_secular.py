@@ -68,10 +68,6 @@ def main():
 
     # Let's take the partners in the top 90% percentile
     approved_list = [x[0] for x in partners if x[1] >= int(max_score*0.9)]
-
-    # Remove religious organizations
-    # allowed_partners = [partner for partner in partners['partners'] if int(partner['id']) not in forbidden_mfi_list]
-    # approved_list = map(lambda x: str(x['id']), allowed_partners)   
     str_approved_list = ','.join(approved_list)
 
     # The output will change every N hours (depending on the cron settings). 
