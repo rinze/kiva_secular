@@ -118,7 +118,7 @@ def main():
             html_data += generateBlock(p)
 
     now = datetime.utcnow()
-    now = now.strftime("%A, %d. %B %Y %I:%M%p")
+    now = now.strftime('%d/%B/%Y @%H:%m')
 
     html_data += '</div>\n<p>Last updated: '
     html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
