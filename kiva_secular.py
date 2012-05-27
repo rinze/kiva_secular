@@ -120,7 +120,7 @@ def main():
     now = datetime.utcnow()
     now = now.strftime('%d/%B/%Y @%H:%m')
 
-    html_data += '</div>\n<p>Last updated: '
+    html_data += '</div>\n<p class="update">Last updated: '
     html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
 
     print html_data 

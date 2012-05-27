@@ -1,4 +1,35 @@
-h1 { text-align: center; }
-#loanlist { overflow: hidden; margin-bottom: 20px; }
-#loanlist div { height: 182px !important; float: left; margin: 0 5px 5px 0 !important; }
-#loanlist p { clear: both; padding: 10px 10px 0 0; text-align: right; }
+/* 
+ * CSS file for Kiva Secular.
+ * Just basic layout, nothing fancy.
+ */
+
+body {
+	width: 80%;
+	margin: 0 10%;
+	font-family: Verdana, sans-serif;
+}
+
+p {
+	font-size: 110%;
+}
+
+h1 { 
+	text-align: center; 
+	color: #666; 
+	font-size: 3em;
+	text-decoration: underline;
+	font-style: italic;
+}
+
+p.update { 
+	float: right;
+	font-size: 90%;
+	color: #888;
+}
+
+
+/*
+ * Main data 
+ * TODO when the actual layout is coded
+ */
+div.loanlist {}
