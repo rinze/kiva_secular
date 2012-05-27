@@ -99,7 +99,7 @@ def main():
         <h1>Kiva Secular</h1>
         <p>Listed below you will find projects being funded by non-religious Kiva field 
         partners. This list has been generated using the information contained on the 
-        <a href="http://atheist-monkey.blogspot.com/2009/08/kiva-mfi-checker.html#list">list compiled</a>
+        <a href="https://docs.google.com/spreadsheet/ccc?authkey=CK36kZMN&key=0AhfuHQgSfgERdDhUOW9jajFUSWFiang0eXVlSGI3YVE&hl=en&authkey=CK36kZMN#gid=0">list compiled</a>
         by the <a href="http://www.kiva.org/community/teams/view?team_id=94">Kiva Lending Team 
         "Atheists, Agnostics, Skeptics, Freethinkers, Secular Humanists and the Non-Religious"</a></p>
         
