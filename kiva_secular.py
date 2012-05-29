@@ -44,8 +44,7 @@ def main():
     # 6 - Secular Rating
     # 9 - Social Rating
     partners = [(p[0], partner_score(p[6], p[9])) for p in csv_data
-                if p[4] == 'active' and p[6] != 0 and p[9] != 0
-                and p[6] != '' and p[9] != '']
+                if p[4] == 'active']
 
     # Get maximum possible score and sort my partners
     max_score = max([p[1] for p in partners])
@@ -105,7 +104,10 @@ def partner_score(secular, social):
     """Computes partner score. There are lots of Kiva partners with a high
     secular rating, so let's use the social rating as well in a weighted
     way."""
-    return 2*secular + social
+    secular = int(secular) if secular != '' else 0
+    social = int(social) if social != '' else 0
+    if secular == 0 or social == 0: return 0
+    else: return 2*secular + social
 
 def get_loans(partners, page, result):
     """Adds a tuple of loan data to results set starting from a 
