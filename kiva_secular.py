@@ -19,8 +19,6 @@ import random
 import csv
 import urllib2
 from cookielib import CookieJar
-
-from ParseKivaProjects import ParseKivaProjects
 from datetime import datetime
 
 __author__ = 'José María Mateos - chema@rinzewind.org'
