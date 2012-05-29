@@ -46,13 +46,12 @@ def main():
     partners = [(p[0], partner_score(p[6], p[9])) for p in csv_data
                 if p[4] == 'active']
 
-    # Get maximum possible score and sort my partners
-    max_score = max([p[1] for p in partners])
+    # Sort partners and get maximum score
     partners.sort(reverse=True, key=lambda x: x[1])
+    max_score = partners[0][1]
 
     # Let's take the partners in the top 90% percentile
     approved_list = [x[0] for x in partners if x[1] >= int(max_score*0.9)]
-    str_approved_list = ','.join(approved_list)
 
     # The output will change every N hours (depending on the cron settings). 
     # Let's choose just a few partners and use them to search for loans
@@ -68,30 +67,18 @@ def main():
 
     # Finally: get 30 loans from all obtained in the search
     # Is this sampling really useful?
-    loans = random.sample(loans, 30)
+    # loans = random.sample(loans, 30)
 
-    html_data = """
-    <html>
-        <head>
-            <title>Kiva Secular Loans</title>
-            <link rel="stylesheet" rev="stylesheet" href="styles.css" type="text/css" media="all">
-        </head>
-        <body>
-        <h1>Kiva Secular</h1>
-        <p>Listed below you will find projects being funded by non-religious Kiva field 
-        partners. This list has been generated using the information contained on the 
-        <a href="https://docs.google.com/spreadsheet/ccc?authkey=CK36kZMN&key=0AhfuHQgSfgERdDhUOW9jajFUSWFiang0eXVlSGI3YVE&hl=en&authkey=CK36kZMN#gid=0">list compiled</a>
-        by the <a href="http://www.kiva.org/community/teams/view?team_id=94">Kiva Lending Team 
-        "Atheists, Agnostics, Skeptics, Freethinkers, Secular Humanists and the Non-Religious"</a></p>
-        
-        <p>You can find the code for the script used to generate this web page 
-        <a href="https://github.com/rinze/kiva_secular/">in Github</a>.</p>
+    # Get HTML data from file
+    html_file = file('index_template.html')
+    html_data = html_file.read()
+    html_file.close()
 
-        <div id="loanlist">
-    """
+    # Include loan data
     for l in loans:
         html_data += generateBlock(l)
 
+    # Add time information and print (output should be redirected)
     now = datetime.utcnow()
     now = now.strftime('%d/%B/%Y @%H:%M')
 
