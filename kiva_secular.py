@@ -102,7 +102,8 @@ def get_loans(partners, page, result):
     # Kiva base URL for API queries
     kb = 'http://api.kivaws.org/v1/'
     q = kb + 'loans/search.json?partner=' + ','.join(partners)
-    q = q + '&status=fundraising&page=' + str(page)
+    q += '&status=fundraising&page=' + str(page)
+    q += '&sort_by=expiration'
 
     # Query API with given data and parse the JSON output
     json_loans = json.JSONDecoder().decode(urllib2.urlopen(q).read())
