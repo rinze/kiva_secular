@@ -14,8 +14,6 @@
 # or write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
     
-import urllib
-import xml.sax.handler
 import json
 import random
 import csv
@@ -28,9 +26,9 @@ from datetime import datetime
 __author__ = 'José María Mateos - chema@rinzewind.org'
 
 def main():
-    # Define variables
-    approved_projects = []
-    parsed_projects = []
+
+    # Tuples of loan data will be added to this set
+    loans = set()
 
     # New list and new method for reading
     url = 'https://docs.google.com/spreadsheet/ccc?key=0AhfuHQgSfgERdDhUOW9jajFUSWFiang0eXVlSGI3YVE&authkey=CK36kZMN&hl=en&output=csv#gid=1'
@@ -46,14 +44,11 @@ def main():
     # 6 - Secular Rating
     # 9 - Social Rating
     partners = [(p[0], partner_score(p[6], p[9])) for p in csv_data
-                if p[4] == 'active']
+                if p[4] == 'active' and p[6] != 0 and p[9] != 0
+                and p[6] != '' and p[9] != '']
 
-    # Get maximum possible score
+    # Get maximum possible score and sort my partners
     max_score = max([p[1] for p in partners])
-
-    # TODO: Might need to rethink the whole score thing
-    # Beware that partners is a variable previously used. 
-    # Won't be necessary when this is complete, though.
     partners.sort(reverse=True, key=lambda x: x[1])
 
     # Let's take the partners in the top 90% percentile
@@ -68,20 +63,13 @@ def main():
     else:
         chosen_partners = approved_list
 
-    # TODO: use the chosen_partners variable to get new projects
+    # Get 5 pages of data (100 loans)
+    for i in range(1, 6):
+        get_loans(chosen_partners, i, loans)
 
-    # New handler for loop below
-    parser = xml.sax.make_parser()
-    handler = ParseKivaProjects()
-    parser.setContentHandler(handler)
-
-    for page in range(1, 6):
-        query_projects_str = buildPartnerURL(str_approved_list, page)
-        temp_sock = urllib.urlopen(query_projects_str)
-        parser.parse(temp_sock)
-        temp_sock.close()
-
-    approved_projects = handler.getApprovedList()
+    # Finally: get 30 loans from all obtained in the search
+    # Is this sampling really useful?
+    loans = random.sample(loans, 30)
 
     html_data = """
     <html>
@@ -102,12 +90,8 @@ def main():
 
         <div id="loanlist">
     """
-    for p in approved_projects:
-        if p not in parsed_projects:
-            parsed_projects.append(p)
-            #html_data += '<SCRIPT type="text/javascript" src="http://www.kiva.org/banners/bannerBlock.php?busId='
-            #html_data += id+'" language="javascript"></SCRIPT>\n'
-            html_data += generateBlock(p)
+    for l in loans:
+        html_data += generateBlock(l)
 
     now = datetime.utcnow()
     now = now.strftime('%d/%B/%Y @%H:%M')
@@ -121,26 +105,33 @@ def partner_score(secular, social):
     """Computes partner score. There are lots of Kiva partners with a high
     secular rating, so let's use the social rating as well in a weighted
     way."""
-    secular = int(secular) if secular != '' else 0
-    social = int(social) if social != '' else 0
-    # No crappy partners
-    if secular == 0 or social == 0: return 0
-    else: return 2*secular + social
+    return 2*secular + social
 
-def generateBlock(project_id):
+def get_loans(partners, page, result):
+    """Adds a tuple of loan data to results set starting from a 
+       list of partners"""
+
+    # Kiva base URL for API queries
+    kb = 'http://api.kivaws.org/v1/'
+    q = kb + 'loans/search.json?partner=' + ','.join(partners)
+    q = q + '&status=fundraising&page=' + str(page)
+
+    # Query API with given data and parse the JSON output
+    json_loans = json.JSONDecoder().decode(urllib2.urlopen(q).read())
+
+    # Get the needed data and store it in the result set
+    for l in json_loans['loans']:
+        result.add((l['id'], l['name'], l['loan_amount'], l['funded_amount'],
+                    l['location']['country'], l['location']['country_code'],
+                    l['activity']))
+
+def generateBlock(loan):
     """Generates the HTML data for a given partner.
     TODO: code improved version"""
-    res = '<a href="http://www.kiva.org/lend/'+project_id+'">'
-    res += 'Loan ' + project_id + '</a> '
-    return res
 
-def buildPartnerURL(partner_id, page):
-    base_string = 'http://api.kivaws.org/v1/loans/search.xml?'
-    base_string += 'status=fundraising'
-    base_string += '&partner='+partner_id
-    base_string += '&page='+str(page)
-    base_string += '&sort_by=popularity'
-    return base_string
+    res = '<a href="http://www.kiva.org/lend/' + str(loan[0]) + '">'
+    res += 'Loan ' + str(loan[0]) + '</a> '
+    return res
 
 if __name__ == '__main__':
     main()
