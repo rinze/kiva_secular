@@ -32,4 +32,25 @@ p.update {
  * Main data 
  * TODO when the actual layout is coded
  */
-div.loanlist {}
+
+div#loanlist {
+    width: 90%;
+    margin: 0 5%;
+}
+
+th {
+    border-bottom: 1px solid black;
+}
+
+tr.evenrow {
+    background-color: #ccc;
+}
+
+tr:hover {
+    background-color: #7c7;
+}
+
+/* No hover for header */
+tr.header:hover { 
+    background-color: #fff;
+}
