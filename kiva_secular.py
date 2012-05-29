@@ -13,7 +13,7 @@
 # program. If not, go to http://www.gnu.org/licenses/gpl.html
 # or write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-
+    
 import urllib
 import xml.sax.handler
 import json
@@ -31,18 +31,6 @@ def main():
     # Define variables
     approved_projects = []
     parsed_projects = []
-    kiva_partners_url_json = 'http://api.kivaws.org/v1/partners.json'
-
-    # Get forbidden partners ids
-    forbidden_mfi_list = getForbiddenList()
-
-    # New method: JSON
-    temp_sock = urllib.urlopen(kiva_partners_url_json)
-    json_data = temp_sock.read()
-    temp_sock.close()
-
-    # Get JSON data as a dictionary
-    partners = json.JSONDecoder().decode(json_data)
 
     # New list and new method for reading
     url = 'https://docs.google.com/spreadsheet/ccc?key=0AhfuHQgSfgERdDhUOW9jajFUSWFiang0eXVlSGI3YVE&authkey=CK36kZMN&hl=en&output=csv#gid=1'
@@ -54,9 +42,11 @@ def main():
 
     # Fields of interest:
     # 0 - ID
+    # 4 - 'active' if working partner
     # 6 - Secular Rating
     # 9 - Social Rating
-    partners = [(p[0], partner_score(p[6], p[9])) for p in csv_data]
+    partners = [(p[0], partner_score(p[6], p[9])) for p in csv_data
+                if p[4] == 'active']
 
     # Get maximum possible score
     max_score = max([p[1] for p in partners])
@@ -71,8 +61,12 @@ def main():
     str_approved_list = ','.join(approved_list)
 
     # The output will change every N hours (depending on the cron settings). 
-    # Let's choose 10 partners and use them to search for loans
-    chosen_partners = random.sample(approved_list, 10)
+    # Let's choose just a few partners and use them to search for loans
+    # Only if there are many (> 10)
+    if len(approved_list) > 10:
+        chosen_partners = random.sample(approved_list, 10)
+    else:
+        chosen_partners = approved_list
 
     # TODO: use the chosen_partners variable to get new projects
 
@@ -116,15 +110,15 @@ def main():
             html_data += generateBlock(p)
 
     now = datetime.utcnow()
-    now = now.strftime('%d/%B/%Y @%H:%m')
+    now = now.strftime('%d/%B/%Y @%H:%M')
 
-    html_data += '</div>\n<p class="update">Last updated: '
+    html_data += '</div>\n<p class="update">Last update: '
     html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
 
     print html_data 
 
 def partner_score(secular, social):
-    """ Computes partner score. There are lots of Kiva partners with a high
+    """Computes partner score. There are lots of Kiva partners with a high
     secular rating, so let's use the social rating as well in a weighted
     way."""
     secular = int(secular) if secular != '' else 0
@@ -134,7 +128,8 @@ def partner_score(secular, social):
     else: return 2*secular + social
 
 def generateBlock(project_id):
-
+    """Generates the HTML data for a given partner.
+    TODO: code improved version"""
     res = '<a href="http://www.kiva.org/lend/'+project_id+'">'
     res += 'Loan ' + project_id + '</a> '
     return res
@@ -146,25 +141,6 @@ def buildPartnerURL(partner_id, page):
     base_string += '&page='+str(page)
     base_string += '&sort_by=popularity'
     return base_string
-
-def getForbiddenList():
-
-    forbidden_mfi_list = []
-    # TODO: change to new list
-    religious_mfi_doc_url = 'http://spreadsheets.google.com/pub?key=ty2bXC4IvFg1ozCoPmsflUQ&single=true&gid=0&output=csv'
-    temp_sock = urllib.urlopen(religious_mfi_doc_url)
-    data = temp_sock.readlines()
-    temp_sock.close()
-    for line in data:
-        mfi_code_list = line.split(',')
-        temp_length = len(mfi_code_list)
-        mfi_code = mfi_code_list[temp_length - 1].strip()
-        if mfi_code != 'MFI ID':
-            forbidden_mfi_list.append(int(mfi_code))
-    
-    return forbidden_mfi_list
-
-
 
 if __name__ == '__main__':
     main()
