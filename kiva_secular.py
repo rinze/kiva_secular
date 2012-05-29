@@ -61,13 +61,11 @@ def main():
     else:
         chosen_partners = approved_list
 
-    # Get 5 pages of data (100 loans)
-    for i in range(1, 6):
+    # Get 10 pages of data (200 loans)
+    for i in range(1, 11):
         get_loans(chosen_partners, i, loans)
 
-    # Finally: get 30 loans from all obtained in the search
-    # Is this sampling really useful?
-    # loans = random.sample(loans, 30)
+    loans = random.sample(loans, 70)
 
     # Get HTML data from file
     html_file = file('index_template.html')
@@ -75,17 +73,20 @@ def main():
     html_file.close()
 
     # Include loan data
-    for l in loans:
-        html_data += generateBlock(l)
+    evenrow = False
+    for loan in loans:
+        html_data += generate_html(loan, evenrow)
+        evenrow = not evenrow
 
     # Add time information and print (output should be redirected)
     now = datetime.utcnow()
     now = now.strftime('%d/%B/%Y @%H:%M')
 
-    html_data += '</div>\n<p class="update">Last update: '
+    html_data += '</table></div>\n<p class="update">Last update: '
     html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
 
-    print html_data 
+    # Careful, UNICODE
+    print html_data
 
 def partner_score(secular, social):
     """Computes partner score. There are lots of Kiva partners with a high
@@ -114,13 +115,29 @@ def get_loans(partners, page, result):
                     l['location']['country'], l['location']['country_code'],
                     l['activity']))
 
-def generateBlock(loan):
-    """Generates the HTML data for a given partner.
-    TODO: code improved version"""
+def generate_html(loan, evenrow):
+    """Generates the HTML data for a given partner"""
+    
+    style = 'evenrow' if evenrow else 'oddrow'
 
-    res = '<a href="http://www.kiva.org/lend/' + str(loan[0]) + '">'
-    res += 'Loan ' + str(loan[0]) + '</a> '
-    return res
+    # Open row, include ID and link it to Kiva page
+    data = '<tr class="' + style + '"><td><a href="http://www.kiva.org/lend/'
+    data += str(loan[0]) + '">' + str(loan[0]) + '</a></td>'
+
+    # Name
+    data += '<td>' + loan[1].encode('latin-1') + '</td>'
+
+    # Country
+    # TODO: use flag image?
+    data += '<td>' + loan[4].encode('latin-1') + '</td>'
+
+    # Funding
+    data += '<td>' + str(loan[3]) + '$/' + str(loan[2]) + '$</td>'
+
+    # Activity and close row
+    data += '<td>' + loan[-1].encode('latin-1') + '</td></tr>'
+
+    return data
 
 if __name__ == '__main__':
     main()
