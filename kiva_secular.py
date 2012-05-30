@@ -99,11 +99,11 @@ def get_loans(partners, page, result):
     """Adds a tuple of loan data to results set starting from a 
        list of partners"""
 
-    # Kiva base URL for API queries
-    kb = 'http://api.kivaws.org/v1/'
-    q = kb + 'loans/search.json?partner=' + ','.join(partners)
-    q += '&status=fundraising&page=' + str(page)
-    q += '&sort_by=expiration'
+    # Build query URL
+    q = 'http://api.kivaws.org/v1/' # Base URL
+    q += 'loans/search.json?partner=' + ','.join(partners) # Partners list
+    q += '&status=fundraising&page=' + str(page) # Fundraising + page
+    q += '&sort_by=expiration' # Get loans close to expiration
 
     # Query API with given data and parse the JSON output
     json_loans = json.JSONDecoder().decode(urllib2.urlopen(q).read())
