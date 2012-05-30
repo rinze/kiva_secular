@@ -78,7 +78,7 @@ def main():
 
     # Add time information and print (output should be redirected)
     now = datetime.utcnow()
-    now = now.strftime('%d/%B/%Y @%H:%M')
+    now = now.strftime('%d/%B/%Y @%H:%M UTC')
 
     html_data += '</table></div>\n<p class="update">Last update: '
     html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
