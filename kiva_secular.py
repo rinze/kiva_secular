@@ -13,8 +13,14 @@
 # program. If not, go to http://www.gnu.org/licenses/gpl.html
 # or write to the Free Software Foundation, Inc.,
 # 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA.
-    
-import json
+
+# Use simplejson if json not available (will make this work with Python 2.5)
+try: 
+    import json
+except ImportError:
+    import simplejson as json
+
+# Regular imports
 import random
 import csv
 import urllib2
