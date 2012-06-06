@@ -4,8 +4,7 @@
 # This file may be licensed under the terms of of the
 # GNU General Public License Version 3 (the ``GPL'').
 #
-# Software distributed under the License is distributed
-# on an ``AS IS'' basis, WITHOUT WARRANTY OF ANY KIND, either
+# Software distributed under the License is distributed # on an ``AS IS'' basis, WITHOUT WARRANTY OF ANY KIND, either
 # express or implied. See the GPL for the specific language
 # governing rights and limitations.
 #
@@ -130,17 +129,17 @@ def generate_html(loan, evenrow):
     data += str(loan[0]) + '">' + str(loan[0]) + '</a></td>'
 
     # Name
-    data += '<td>' + loan[1].encode('latin-1') + '</td>'
+    data += '<td>' + loan[1].encode('utf-8') + '</td>'
 
     # Country
     # TODO: use flag image?
-    data += '<td>' + loan[4].encode('latin-1') + '</td>'
+    data += '<td>' + loan[4].encode('utf-8') + '</td>'
 
     # Funding
     data += '<td>' + str(loan[3]) + '$/' + str(loan[2]) + '$</td>'
 
     # Activity and close row
-    data += '<td>' + loan[-1].encode('latin-1') + '</td></tr>'
+    data += '<td>' + loan[-1].encode('utf-8') + '</td></tr>'
 
     return data
 
