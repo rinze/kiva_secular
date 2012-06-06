@@ -88,7 +88,7 @@ def main():
     html_data += '</table></div>\n<p class="update">Last update: '
     html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
 
-    # Careful, UNICODE
+    # Print result to standard output
     print html_data
 
 def partner_score(secular, social):
