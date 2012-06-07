@@ -129,17 +129,18 @@ def generate_html(loan, evenrow):
     data += str(loan[0]) + '">' + str(loan[0]) + '</a></td>'
 
     # Name
-    data += '<td>' + loan[1].encode('utf-8') + '</td>'
+    data += '<td>' + loan[1].replace('&', '&amp;').encode('ascii', 'xmlcharrefreplace') \
+            + '</td>'
 
     # Country
     # TODO: use flag image?
-    data += '<td>' + loan[4].encode('utf-8') + '</td>'
+    data += '<td>' + loan[4].encode('ascii', 'xmlcharrefreplace') + '</td>'
 
     # Funding
     data += '<td>' + str(loan[3]) + '$/' + str(loan[2]) + '$</td>'
 
     # Activity and close row
-    data += '<td>' + loan[-1].encode('utf-8') + '</td></tr>'
+    data += '<td>' + loan[-1].encode('ascii', 'xmlcharrefreplace') + '</td></tr>'
 
     return data
 
