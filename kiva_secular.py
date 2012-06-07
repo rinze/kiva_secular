@@ -86,7 +86,7 @@ def main():
     now = now.strftime('%d/%B/%Y @%H:%M UTC')
 
     html_data += '</table></div>\n<p class="update">Last update: '
-    html_data += now + '</p>\n\n</div>\n\n</body>\n</html>'
+    html_data += now + '</p>\n\n</body>\n</html>'
 
     # Print result to standard output
     print html_data
@@ -140,7 +140,8 @@ def generate_html(loan, evenrow):
     data += '<td>' + str(loan[3]) + '$/' + str(loan[2]) + '$</td>'
 
     # Activity and close row
-    data += '<td>' + loan[-1].encode('ascii', 'xmlcharrefreplace') + '</td></tr>'
+    data += '<td>' + loan[-1].replace('&', '&amp;').encode('ascii', 'xmlcharrefreplace') \
+            + '</td></tr>'
 
     return data
 
