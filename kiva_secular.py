@@ -34,7 +34,7 @@ def main():
     loans = set()
 
     # New list and new method for reading
-    url = 'https://docs.google.com/spreadsheet/ccc?key=0AhfuHQgSfgERdDhUOW9jajFUSWFiang0eXVlSGI3YVE&authkey=CK36kZMN&hl=en&output=csv#gid=1'
+    url = 'https://docs.google.com/spreadsheet/ccc?key=0AhfuHQgSfgERdDhUOW9jajFUSWFiang0eXVlSGI3YVE&authkey=CK36kZMN&hl=en&output=csv&gid=1'
     # Cookie management
     opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(CookieJar()))
     csv_data = csv.reader(opener.open(url))
